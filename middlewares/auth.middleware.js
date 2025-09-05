@@ -1,0 +1,64 @@
+const JWTUtils = require('../utils/jwt.utils');
+
+const authenticateToken = async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({
+                success: false,
+                message: 'Bearer token is required'
+            });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: 'Access token is required'
+            });
+        }
+
+        try {
+            const decoded = await JWTUtils.verifyToken(token);
+            
+            // Validate required payload fields
+            if (!decoded.id || !decoded.email || !decoded.role_id || !decoded.organisation_id) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid token payload'
+                });
+            }
+
+            // Attach user data to request
+            req.user = {
+                id: decoded.id,
+                email: decoded.email,
+                role_id: decoded.role_id,
+                organisation_id: decoded.organisation_id
+            };
+
+            next();
+        } catch (error) {
+            if (error.message === 'Token has expired') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Token has expired'
+                });
+            }
+            return res.status(403).json({
+                success: false,
+                message: error.message || 'Invalid token'
+            });
+        }
+    } catch (error) {
+        console.error('Auth middleware error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
+
+module.exports = {
+    authenticateToken
+};
