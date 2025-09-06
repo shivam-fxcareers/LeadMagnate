@@ -72,8 +72,7 @@ class RoleController {
 
     static async updateRole(req, res) {
         try {
-            const { id } = req.params;
-            const { name } = req.body;
+            const { id, name } = req.body;
 
             const roleExists = await RoleModel.getById(id);
             if (!roleExists) {

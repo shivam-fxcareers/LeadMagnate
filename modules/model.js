@@ -2,6 +2,7 @@ const { db } = require('../config/dbConfig');
 
 class ModuleModel {
   static tableName = 'modules';
+  static modulesTableName = 'organisation_modules';
 
   static async create(name) {
     try {
@@ -63,6 +64,68 @@ class ModuleModel {
       return deleted > 0;
     } catch (error) {
       console.error('Error deleting module:', error);
+      throw error;
+    }
+  }
+
+
+  static async attachToOrganisation(moduleId, organisationId) {
+    try {
+      const [id] = await db(this.modulesTableName)
+        .insert({
+          organisation_id: organisationId,
+          module_id: moduleId
+        });
+      return id;
+    } catch (error) {
+      console.error('Error attaching module to organisation:', error);
+      throw error;
+    }
+  }
+
+  static async detachFromOrganisation(moduleId, organisationId) {
+    try {
+      const deleted = await db(this.modulesTableName)
+        .where({
+          organisation_id: organisationId,
+          module_id: moduleId
+        })
+        .delete();
+      return deleted > 0;
+    } catch (error) {
+      console.error('Error detaching module from organisation:', error);
+      throw error;
+    }
+  }
+
+  static async getOrganisationModules(organisationId) {
+    try {
+      const modules = await db(this.tableName)
+        .select(`${this.tableName}.*`)
+        .join(
+          this.modulesTableName,
+          `${this.tableName}.id`,
+          `${this.modulesTableName}.module_id`
+        )
+        .where(`${this.modulesTableName}.organisation_id`, organisationId);
+      return modules;
+    } catch (error) {
+      console.error('Error fetching organisation modules:', error);
+      throw error;
+    }
+  }
+
+  static async isModuleAttached(moduleId, organisationId) {
+    try {
+      const exists = await db(this.modulesTableName)
+        .where({
+          organisation_id: organisationId,
+          module_id: moduleId
+        })
+        .first();
+      return !!exists;
+    } catch (error) {
+      console.error('Error checking module attachment:', error);
       throw error;
     }
   }

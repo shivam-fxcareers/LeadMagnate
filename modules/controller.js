@@ -105,6 +105,96 @@ class ModuleController {
       });
     }
   }
+
+
+  static async attachModuleToOrganisation(req, res) {
+    try {
+      const { moduleId, organisationId } = req.body;
+
+      // Check if module exists
+      const module = await ModuleModel.findById(moduleId);
+      if (!module) {
+        return res.status(404).json({
+          success: false,
+          error: 'Module not found'
+        });
+      }
+
+      // Check if already attached
+      const isAttached = await ModuleModel.isModuleAttached(moduleId, organisationId);
+      if (isAttached) {
+        return res.status(400).json({
+          success: false,
+          error: 'Module is already attached to this organisation'
+        });
+      }
+
+      await ModuleModel.attachToOrganisation(moduleId, organisationId);
+      
+      res.json({
+        success: true,
+        message: 'Module attached to organisation successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to attach module to organisation'
+      });
+    }
+  }
+
+  static async detachModuleFromOrganisation(req, res) {
+    try {
+      const { moduleId, organisationId } = req.body;
+
+      // Check if module exists
+      const module = await ModuleModel.findById(moduleId);
+      if (!module) {
+        return res.status(404).json({
+          success: false,
+          error: 'Module not found'
+        });
+      }
+
+      // Check if actually attached
+      const isAttached = await ModuleModel.isModuleAttached(moduleId, organisationId);
+      if (!isAttached) {
+        return res.status(400).json({
+          success: false,
+          error: 'Module is not attached to this organisation'
+        });
+      }
+
+      await ModuleModel.detachFromOrganisation(moduleId, organisationId);
+      
+      res.json({
+        success: true,
+        message: 'Module detached from organisation successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to detach module from organisation'
+      });
+    }
+  }
+
+  static async getOrganisationModules(req, res) {
+    try {
+      const { organisationId } = req.params;
+      const modules = await ModuleModel.getOrganisationModules(organisationId);
+      
+      res.json({
+        success: true,
+        data: modules
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch organisation modules'
+      });
+    }
+  }
 }
 
 module.exports = ModuleController;

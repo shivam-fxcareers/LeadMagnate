@@ -23,6 +23,15 @@ const idParamSchema = z.object({
   query: z.object({}).optional()
 });
 
+const organisationModuleSchema = z.object({
+  moduleId: z.number().int().positive('Module ID must be a positive integer'),
+  organisationId: z.number().int().positive('Organisation ID must be a positive integer')
+});
+
+const organisationIdParamSchema = z.object({
+  organisationId: z.string().regex(/^\d+$/, 'Invalid organisation ID')
+});
+
 // Create a new module
 router.post('/',
   authenticateToken,
@@ -60,6 +69,30 @@ router.delete('/:id',
   checkSuperAdmin,
   validateRequest(idParamSchema),
   ModuleController.deleteModule
+);
+
+// Attach a module to an organisation
+router.post('/attach',
+  authenticateToken,
+  checkSuperAdmin,
+  validateRequest(organisationModuleSchema),
+  ModuleController.attachModuleToOrganisation
+);
+
+// Detach a module from an organisation
+router.post('/detach',
+  authenticateToken,
+  checkSuperAdmin,
+  validateRequest(organisationModuleSchema),
+  ModuleController.detachModuleFromOrganisation
+);
+
+// Get all modules for an organisation
+router.get('/organisation/:organisationId',
+  authenticateToken,
+  checkSuperAdmin,
+  validateRequest(organisationIdParamSchema),
+  ModuleController.getOrganisationModules
 );
 
 module.exports = router;

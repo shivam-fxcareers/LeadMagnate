@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 06, 2025 at 05:34 AM
+-- Generation Time: Sep 06, 2025 at 11:39 PM
 -- Server version: 8.0.41
 -- PHP Version: 8.2.12
 
@@ -79,6 +79,20 @@ INSERT INTO `organisations` (`id`, `name`, `legal_name`, `registration_number`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `organisation_resources`
+--
+
+CREATE TABLE `organisation_resources` (
+  `id` int NOT NULL,
+  `organisation_id` int NOT NULL,
+  `resource_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `otps`
 --
 
@@ -90,6 +104,13 @@ CREATE TABLE `otps` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `expires_at` timestamp NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `otps`
+--
+
+INSERT INTO `otps` (`id`, `otp`, `user_id`, `type`, `created_at`, `expires_at`) VALUES
+(6, '885534', 6, 'EMAIL_VERIFICATION', '2025-09-06 09:55:13', '2025-09-06 10:10:13');
 
 -- --------------------------------------------------------
 
@@ -116,6 +137,35 @@ INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `role_permissions`
+--
+
+CREATE TABLE `role_permissions` (
+  `id` int NOT NULL,
+  `role_id` int NOT NULL,
+  `module_id` int NOT NULL,
+  `can_create` tinyint(1) DEFAULT '0',
+  `can_read` tinyint(1) DEFAULT '0',
+  `can_update` tinyint(1) DEFAULT '0',
+  `can_delete` tinyint(1) DEFAULT '0',
+  `scope` enum('global','org') NOT NULL DEFAULT 'org',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `role_permissions`
+--
+
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_create`, `can_read`, `can_update`, `can_delete`, `scope`, `created_at`, `updated_at`) VALUES
+(2, 1, 2, 1, 1, 1, 1, 'global', '2025-09-06 21:35:57', '2025-09-06 21:35:57'),
+(3, 1, 3, 1, 1, 1, 1, 'global', '2025-09-06 21:36:10', '2025-09-06 21:36:10'),
+(4, 1, 4, 1, 1, 1, 1, 'global', '2025-09-06 21:36:21', '2025-09-06 21:36:21'),
+(5, 1, 5, 1, 1, 1, 1, 'global', '2025-09-06 21:36:35', '2025-09-06 21:36:35');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -138,7 +188,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password`, `is_verified`, `organisation_id`, `role_id`, `created_at`, `updated_at`) VALUES
 (1, 'Shiv SuperAdmin', 'shivam@fxcareer.com', '+919876543210', '$2a$12$RHSYukiu9CkVqXshenQwM.LXEgeXrE4dMKNWONhf0SdrZ/8dCAGxG', 1, 1, 1, '2025-09-05 18:10:25', '2025-09-05 21:20:57'),
-(5, 'John Doe', 'shivamw71@gmail.com', '+919876543211', '$2a$12$5sLaHs0PocxMzg5mU9XbcOX20TEqE8DIS0kQxofeiMNt703dT.gNO', 1, NULL, NULL, '2025-09-05 19:16:47', '2025-09-05 19:18:22');
+(5, 'John Doe', 'shivamw71@gmail.com', '+919876543211', '$2a$12$5sLaHs0PocxMzg5mU9XbcOX20TEqE8DIS0kQxofeiMNt703dT.gNO', 1, NULL, NULL, '2025-09-05 19:16:47', '2025-09-05 19:18:22'),
+(6, 'John Doe', 'shivamw711@gmail.com', '+919876543511', '$2a$12$qjFY5I6jArr./I4zUz14s.M7jiFC8wXGQggWbyA8ZOiV2.XTpxImC', 0, NULL, NULL, '2025-09-06 09:55:13', '2025-09-06 09:55:13');
 
 --
 -- Indexes for dumped tables
@@ -160,6 +211,14 @@ ALTER TABLE `organisations`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `organisation_resources`
+--
+ALTER TABLE `organisation_resources`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `organisation_id` (`organisation_id`,`resource_id`),
+  ADD KEY `resource_id` (`resource_id`);
+
+--
 -- Indexes for table `otps`
 --
 ALTER TABLE `otps`
@@ -172,6 +231,14 @@ ALTER TABLE `otps`
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `role_id` (`role_id`,`module_id`),
+  ADD KEY `resource_id` (`module_id`);
 
 --
 -- Indexes for table `users`
@@ -200,32 +267,58 @@ ALTER TABLE `organisations`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `organisation_resources`
+--
+ALTER TABLE `organisation_resources`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `otps`
 --
 ALTER TABLE `otps`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `organisation_resources`
+--
+ALTER TABLE `organisation_resources`
+  ADD CONSTRAINT `organisation_resources_ibfk_1` FOREIGN KEY (`organisation_id`) REFERENCES `organisations` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `organisation_resources_ibfk_2` FOREIGN KEY (`resource_id`) REFERENCES `modules` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `otps`
 --
 ALTER TABLE `otps`
   ADD CONSTRAINT `otps_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  ADD CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`module_id`) REFERENCES `modules` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `users`

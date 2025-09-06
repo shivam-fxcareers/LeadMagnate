@@ -38,7 +38,7 @@ router.get('/:id',
     RoleController.getRoleById
 );
 
-router.put('/:id',
+router.put('/',
     authenticateToken,
     checkSuperAdmin,
     validateRequest(idParamSchema),
