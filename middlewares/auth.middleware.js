@@ -1,5 +1,24 @@
 const JWTUtils = require('../utils/jwt.utils');
 
+const validateRequest = (schema) => {
+    return (req, res, next) => {
+        try {
+            schema.parse({
+                body: req.body,
+                query: req.query,
+                params: req.params
+            });
+            next();
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                errors: error.errors
+            });
+        }
+    };
+};
+
 const authenticateToken = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
@@ -59,6 +78,34 @@ const authenticateToken = async (req, res, next) => {
     }
 };
 
+const checkSuperAdmin = async (req, res, next) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
+        if (req.user.role_id !== 1) {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied. Superadmin privileges required.'
+            });
+        }
+
+        next();
+    } catch (error) {
+        console.error('SuperAdmin check error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
+
 module.exports = {
-    authenticateToken
+    authenticateToken,
+    checkSuperAdmin,
+    validateRequest
 };

@@ -1,23 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const AuthController = require('./controller');
-const { authenticateToken } = require('../middlewares/auth.middleware');
-
-// Validation middleware
-const validateRequest = (schema) => {
-    return (req, res, next) => {
-        try {
-            schema.parse(req.body);
-            next();
-        } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: 'Validation failed',
-                errors: error.errors
-            });
-        }
-    };
-};
+const { authenticateToken, validateRequest } = require('../middlewares/auth.middleware');
 
 // Validation schemas
 const { z } = require('zod');

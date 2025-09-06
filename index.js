@@ -2,9 +2,13 @@ const express = require('express');
 const app = express();
 const { testConnection } = require('./config/dbConfig');
 const authRoutes = require('./auth/routes');
+const moduleRoutes = require('./modules/routes');
+const organisationRoutes = require('./organisation/routes');
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use('/api/modules', moduleRoutes);
+app.use('/api/organisations', organisationRoutes);
 
 const PORT = process.env.PORT || 3000;
 
