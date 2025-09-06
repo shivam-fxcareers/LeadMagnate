@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 05, 2025 at 08:13 PM
+-- Generation Time: Sep 06, 2025 at 05:34 AM
 -- Server version: 8.0.41
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,29 @@ SET time_zone = "+00:00";
 --
 -- Database: `lead_magnate`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `modules`
+--
+
+CREATE TABLE `modules` (
+  `id` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `modules`
+--
+
+INSERT INTO `modules` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(2, 'roles', '2025-09-05 21:58:23', '2025-09-05 21:58:23'),
+(3, 'organisation', '2025-09-05 21:58:36', '2025-09-05 21:58:36'),
+(4, 'user', '2025-09-05 21:58:42', '2025-09-05 21:58:42'),
+(5, 'permission', '2025-09-05 21:58:50', '2025-09-05 21:58:50');
 
 -- --------------------------------------------------------
 
@@ -50,7 +73,8 @@ CREATE TABLE `organisations` (
 --
 
 INSERT INTO `organisations` (`id`, `name`, `legal_name`, `registration_number`, `tax_id`, `industry`, `website`, `phone`, `email`, `city`, `state`, `country`, `logo_url`, `created_at`, `updated_at`) VALUES
-(1, 'LeadMagnate', 'LeadMagnate Pvt Ltd', 'REG123456', 'TAX987654', 'Software', 'https://leadmagnate.com', '+911234567890', 'contact@leadmagnate.com', 'Bengaluru', 'Karnataka', 'India', 'https://leadmagnate.com/logo.png', '2025-09-05 18:10:25', '2025-09-05 18:10:25');
+(1, 'Test Organisation', 'Test Org Pvt Ltd', 'REG1243', 'TAX1243', 'Technology', 'https://testorg2.com', '+911234567890', 'contact@testorg2.com', 'Mumbai', 'Maharashtra', 'India', 'https://testorg.com/logo.png', '2025-09-05 18:10:25', '2025-09-05 22:18:25'),
+(2, 'Test Organisation', 'Test Org Pvt Ltd', 'REG123', 'TAX123', 'Technology', 'https://testorg.com', '+911234567890', 'contact@testorg.com', 'Mumbai', 'Maharashtra', 'India', 'https://testorg.com/logo.png', '2025-09-05 22:15:18', '2025-09-05 22:15:18');
 
 -- --------------------------------------------------------
 
@@ -113,11 +137,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password`, `is_verified`, `organisation_id`, `role_id`, `created_at`, `updated_at`) VALUES
-(1, 'Shiv SuperAdmin', 'shiv@leadmagnate.com', '+919876543210', '$2a$12$uouFqHQ.cv.NIrw0Ve3sje2lorov8.mCrrdwaxO.onnu4gJcMKZoO', 1, 1, 1, '2025-09-05 18:10:25', '2025-09-05 18:10:25');
+(1, 'Shiv SuperAdmin', 'shivam@fxcareer.com', '+919876543210', '$2a$12$RHSYukiu9CkVqXshenQwM.LXEgeXrE4dMKNWONhf0SdrZ/8dCAGxG', 1, 1, 1, '2025-09-05 18:10:25', '2025-09-05 21:20:57'),
+(5, 'John Doe', 'shivamw71@gmail.com', '+919876543211', '$2a$12$5sLaHs0PocxMzg5mU9XbcOX20TEqE8DIS0kQxofeiMNt703dT.gNO', 1, NULL, NULL, '2025-09-05 19:16:47', '2025-09-05 19:18:22');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `modules`
+--
+ALTER TABLE `modules`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `organisations`
@@ -157,16 +188,22 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `modules`
+--
+ALTER TABLE `modules`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `organisations`
 --
 ALTER TABLE `organisations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `otps`
 --
 ALTER TABLE `otps`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -178,7 +215,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
