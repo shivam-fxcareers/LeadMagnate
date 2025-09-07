@@ -68,6 +68,34 @@ class AuthModel {
             .first();
     }
 
+    static async getUserModulePermissions(userId) {
+        const user = await db('users')
+            .where('users.id', userId)
+            .first();
+
+        if (!user || !user.role_id || !user.organisation_id) {
+            return [];
+        }
+
+        return db('role_permissions as rp')
+            .select(
+                'rp.module_id',
+                'm.name as module_name',
+                'rp.can_create',
+                'rp.can_read',
+                'rp.can_update',
+                'rp.can_delete',
+                'rp.scope'
+            )
+            .join('modules as m', 'm.id', 'rp.module_id')
+            .join('organisation_modules as om', function() {
+                this.on('om.module_id', 'rp.module_id')
+                    .andOn('om.organisation_id', db.raw('?', [user.organisation_id]));
+            })
+            .where('rp.role_id', user.role_id)
+            .orderBy('m.name');
+    }
+
     static async verifyPassword(password, hashedPassword) {
         return bcrypt.compare(password, hashedPassword);
     }

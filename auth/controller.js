@@ -130,6 +130,9 @@ class AuthController {
                 organisation_id: user.organisation_id
             });
 
+            // Get user's module permissions
+            const modulePermissions = await AuthModel.getUserModulePermissions(user.id);
+
             // Prepare response data
             const userData = {
                 id: user.id,
@@ -144,7 +147,18 @@ class AuthController {
                 role: {
                     id: user.role_id,
                     name: user.role_name
-                }
+                },
+                modules: modulePermissions.map(permission => ({
+                    id: permission.module_id,
+                    name: permission.module_name,
+                    permissions: {
+                        create: permission.can_create,
+                        read: permission.can_read,
+                        update: permission.can_update,
+                        delete: permission.can_delete
+                    },
+                    scope: permission.scope
+                }))
             };
 
             res.json({
