@@ -73,7 +73,7 @@ class AuthModel {
             .where('users.id', userId)
             .first();
 
-        if (!user || !user.role_id || !user.organisation_id) {
+        if (!user || !user.role_id) {
             return [];
         }
 
@@ -88,10 +88,6 @@ class AuthModel {
                 'rp.scope'
             )
             .join('modules as m', 'm.id', 'rp.module_id')
-            .join('organisation_modules as om', function() {
-                this.on('om.module_id', 'rp.module_id')
-                    .andOn('om.organisation_id', db.raw('?', [user.organisation_id]));
-            })
             .where('rp.role_id', user.role_id)
             .orderBy('m.name');
     }

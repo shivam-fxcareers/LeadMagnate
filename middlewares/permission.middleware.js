@@ -9,15 +9,30 @@ const METHOD_PERMISSION_MAP = {
     'DELETE': 'can_delete'
 };
 
+const SUPERADMIN_ROLE_ID = 1;
+
 const checkModulePermission = (moduleId) => {
     return async (req, res, next) => {
         try {
-            // 1. Check if user exists and has organization
+            // 1. Check if user exists and get their details
             const user = await db('users')
                 .where('id', req.user.id)
                 .first();
 
-            if (!user || !user.organisation_id) {
+            if (!user) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
+
+            // If user is superadmin, allow all operations
+            if (user.role_id === SUPERADMIN_ROLE_ID) {
+                return next();
+            }
+
+            // For non-superadmin users, check organization association
+            if (!user.organisation_id) {
                 return res.status(403).json({
                     success: false,
                     message: 'User is not associated with any organization'
