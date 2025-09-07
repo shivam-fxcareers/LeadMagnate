@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const RoleController = require('./controller');
-const { authenticateToken, checkSuperAdmin, validateRequest } = require('../middlewares/auth.middleware');
+const { authenticateToken, validateRequest } = require('../middlewares/auth.middleware');
+const { checkModulePermission } = require('../middlewares/permission.middleware');
 const { z } = require('zod');
+
+// Define module ID for roles management
+const MODULE_ID = 2; // ID from modules table for 'roles' module
 
 // Validation schemas
 const createRoleSchema = z.object({
@@ -20,27 +24,27 @@ const idParamSchema = z.object({
 // Routes - all require authentication and superadmin privileges
 router.post('/', 
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(createRoleSchema),
     RoleController.createRole
 );
 
 router.get('/',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     RoleController.getAllRoles
 );
 
 router.get('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     RoleController.getRoleById
 );
 
 router.put('/',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     validateRequest(updateRoleSchema),
     RoleController.updateRole
@@ -48,7 +52,7 @@ router.put('/',
 
 router.delete('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     RoleController.deleteRole
 );

@@ -1,7 +1,11 @@
 const express = require('express');
 const { z } = require('zod');
 const RolePermissionController = require('./controller');
-const { validateRequest, authenticateToken, checkSuperAdmin } = require('../middlewares/auth.middleware');
+const { validateRequest, authenticateToken } = require('../middlewares/auth.middleware');
+const { checkModulePermission } = require('../middlewares/permission.middleware');
+
+// Define module ID for role permissions
+const MODULE_ID = 5; // ID from modules table for 'permission' module
 
 const router = express.Router();
 
@@ -28,7 +32,7 @@ const roleIdParamSchema = z.object({
 // Create a new role permission
 router.post('/',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(createRolePermissionSchema),
     RolePermissionController.createRolePermission
 );
@@ -36,14 +40,14 @@ router.post('/',
 // Get all role permissions
 router.get('/',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     RolePermissionController.getAllRolePermissions
 );
 
 // Get a specific role permission
 router.get('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     RolePermissionController.getRolePermissionById
 );
@@ -51,7 +55,7 @@ router.get('/:id',
 // Get all permissions for a specific role
 router.get('/role/:roleId',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(roleIdParamSchema),
     RolePermissionController.getRolePermissionsByRoleId
 );
@@ -59,7 +63,7 @@ router.get('/role/:roleId',
 // Update a role permission
 router.put('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     (req, res, next) => {
         if (Object.keys(req.body).length === 0) {
@@ -81,7 +85,7 @@ router.put('/:id',
 // Delete a role permission
 router.delete('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     RolePermissionController.deleteRolePermission
 );

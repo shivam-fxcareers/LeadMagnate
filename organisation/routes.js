@@ -1,7 +1,11 @@
 const express = require('express');
 const { z } = require('zod');
 const OrganisationController = require('./controller');
-const { validateRequest, authenticateToken, checkSuperAdmin } = require('../middlewares/auth.middleware');
+const { validateRequest, authenticateToken } = require('../middlewares/auth.middleware');
+const { checkModulePermission } = require('../middlewares/permission.middleware');
+
+// Define module ID for organisation management
+const MODULE_ID = 3; // ID from modules table for 'organisations' module
 
 const router = express.Router();
 
@@ -29,7 +33,7 @@ const idParamSchema = z.object({
 // Create a new organisation
 router.post('/',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(createOrganisationSchema),
     OrganisationController.createOrganisation
 );
@@ -37,14 +41,14 @@ router.post('/',
 // Get all organisations
 router.get('/',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     OrganisationController.getAllOrganisations
 );
 
 // Get a specific organisation
 router.get('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     OrganisationController.getOrganisationById
 );
@@ -52,7 +56,7 @@ router.get('/:id',
 // Update an organisation
 router.put('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema.merge(updateOrganisationSchema)),
     OrganisationController.updateOrganisation
 );
@@ -60,7 +64,7 @@ router.put('/:id',
 // Delete an organisation
 router.delete('/:id',
     authenticateToken,
-    checkSuperAdmin,
+    checkModulePermission(MODULE_ID),
     validateRequest(idParamSchema),
     OrganisationController.deleteOrganisation
 );

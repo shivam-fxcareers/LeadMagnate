@@ -1,7 +1,11 @@
 const express = require('express');
 const { z } = require('zod');
 const ModuleController = require('./controller');
-const { validateRequest, authenticateToken, checkSuperAdmin } = require('../middlewares/auth.middleware');
+const { validateRequest, authenticateToken } = require('../middlewares/auth.middleware');
+const { checkModulePermission } = require('../middlewares/permission.middleware');
+
+// Define module ID for modules management
+const MODULE_ID = 2; // ID from modules table for 'roles' module
 
 const router = express.Router();
 
@@ -35,7 +39,7 @@ const organisationIdParamSchema = z.object({
 // Create a new module
 router.post('/',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(createModuleSchema),
   ModuleController.createModule
 );
@@ -43,14 +47,14 @@ router.post('/',
 // Get all modules
 router.get('/',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   ModuleController.getAllModules
 );
 
 // Get a specific module
 router.get('/:id',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(idParamSchema),
   ModuleController.getModuleById
 );
@@ -58,7 +62,7 @@ router.get('/:id',
 // Update a module
 router.put('/:id',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(idParamSchema.merge(updateModuleSchema)),
   ModuleController.updateModule
 );
@@ -66,7 +70,7 @@ router.put('/:id',
 // Delete a module
 router.delete('/:id',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(idParamSchema),
   ModuleController.deleteModule
 );
@@ -74,7 +78,7 @@ router.delete('/:id',
 // Attach a module to an organisation
 router.post('/attach',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(organisationModuleSchema),
   ModuleController.attachModuleToOrganisation
 );
@@ -82,7 +86,7 @@ router.post('/attach',
 // Detach a module from an organisation
 router.post('/detach',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(organisationModuleSchema),
   ModuleController.detachModuleFromOrganisation
 );
@@ -90,7 +94,7 @@ router.post('/detach',
 // Get all modules for an organisation
 router.get('/organisation/:organisationId',
   authenticateToken,
-  checkSuperAdmin,
+  checkModulePermission(MODULE_ID),
   validateRequest(organisationIdParamSchema),
   ModuleController.getOrganisationModules
 );
