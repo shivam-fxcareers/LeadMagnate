@@ -3,9 +3,14 @@ const JWTUtils = require('../utils/jwt.utils');
 const validateRequest = (schema) => {
     return (req, res, next) => {
         try {
-            const dataToValidate = req.method === 'GET' || req.method === 'DELETE' 
-                ? req.params 
-                : req.body;
+            let dataToValidate;
+            if (req.method === 'GET' || req.method === 'DELETE') {
+                dataToValidate = req.params;
+            } else if (req.method === 'PUT' && schema.shape.id) {
+                dataToValidate = req.params;
+            } else {
+                dataToValidate = req.body;
+            }
             schema.parse(dataToValidate);
             next();
         } catch (error) {
