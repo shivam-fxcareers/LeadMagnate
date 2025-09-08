@@ -1,31 +1,5 @@
 const JWTUtils = require('../utils/jwt.utils');
 
-const validateRequest = (schema) => {
-    return (req, res, next) => {
-        try {
-            let dataToValidate;
-            if (req.method === 'GET' || req.method === 'DELETE') {
-                dataToValidate = req.params;
-            } else if (req.method === 'PUT' && schema.shape.id) {
-                dataToValidate = req.params;
-            } else {
-                dataToValidate = req.body;
-            }
-            schema.parse(dataToValidate);
-            next();
-        } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: 'Validation failed',
-                errors: error.errors.map(err => ({
-                    field: err.path.join('.'),
-                    message: err.message
-                }))
-            });
-        }
-    };
-};
-
 const authenticateToken = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
@@ -113,6 +87,5 @@ const checkSuperAdmin = async (req, res, next) => {
 
 module.exports = {
     authenticateToken,
-    checkSuperAdmin,
-    validateRequest
+    checkSuperAdmin
 };

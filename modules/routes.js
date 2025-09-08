@@ -1,7 +1,6 @@
 const express = require('express');
-const { z } = require('zod');
 const ModuleController = require('./controller');
-const { validateRequest, authenticateToken } = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middlewares/auth.middleware');
 const { checkModulePermission } = require('../middlewares/permission.middleware');
 
 // Define module ID for modules management
@@ -9,38 +8,10 @@ const MODULE_ID = 2; // ID from modules table for 'roles' module
 
 const router = express.Router();
 
-const createModuleSchema = z.object({
-  body: z.object({
-    name: z.string().min(1, 'Module name is required').max(100, 'Module name must be less than 100 characters')
-  }),
-  query: z.object({}).optional(),
-  params: z.object({}).optional()
-});
-
-const updateModuleSchema = createModuleSchema;
-
-const idParamSchema = z.object({
-  params: z.object({
-    id: z.string().regex(/^\d+$/, 'Invalid module ID')
-  }),
-  body: z.object({}).optional(),
-  query: z.object({}).optional()
-});
-
-const organisationModuleSchema = z.object({
-  moduleId: z.number().int().positive('Module ID must be a positive integer'),
-  organisationId: z.number().int().positive('Organisation ID must be a positive integer')
-});
-
-const organisationIdParamSchema = z.object({
-  organisationId: z.string().regex(/^\d+$/, 'Invalid organisation ID')
-});
-
 // Create a new module
 router.post('/',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(createModuleSchema),
   ModuleController.createModule
 );
 
@@ -55,7 +26,6 @@ router.get('/',
 router.get('/:id',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(idParamSchema),
   ModuleController.getModuleById
 );
 
@@ -63,7 +33,6 @@ router.get('/:id',
 router.put('/:id',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(idParamSchema.merge(updateModuleSchema)),
   ModuleController.updateModule
 );
 
@@ -71,7 +40,6 @@ router.put('/:id',
 router.delete('/:id',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(idParamSchema),
   ModuleController.deleteModule
 );
 
@@ -79,7 +47,6 @@ router.delete('/:id',
 router.post('/attach',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(organisationModuleSchema),
   ModuleController.attachModuleToOrganisation
 );
 
@@ -87,7 +54,6 @@ router.post('/attach',
 router.post('/detach',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(organisationModuleSchema),
   ModuleController.detachModuleFromOrganisation
 );
 
@@ -95,7 +61,6 @@ router.post('/detach',
 router.get('/organisation/:organisationId',
   authenticateToken,
   checkModulePermission(MODULE_ID),
-  validateRequest(organisationIdParamSchema),
   ModuleController.getOrganisationModules
 );
 
