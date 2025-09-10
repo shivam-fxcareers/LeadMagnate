@@ -68,6 +68,132 @@ CREATE TABLE `organisations` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+
+CREATE TABLE lead_meta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organisation_id INT NOT NULL,                       -- map to your organisations
+    platform_key ENUM('facebook','instagram','website') NOT NULL,
+    source_lead_id VARCHAR(128) NOT NULL,               -- lead_id from FB/IG/web
+    page_id VARCHAR(64),
+    form_id VARCHAR(64),
+    ad_id VARCHAR(64),
+    campaign_id VARCHAR(64),
+    created_time DATETIME,
+    received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    page_url VARCHAR(512),
+    utm_source VARCHAR(100),
+    utm_medium VARCHAR(100),
+    utm_campaign VARCHAR(150),
+    utm_term VARCHAR(100),
+    utm_content VARCHAR(100),
+    processing_status ENUM('received','processed','failed') DEFAULT 'received',
+
+    CONSTRAINT fk_leadmeta_org FOREIGN KEY (organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    UNIQUE (platform_key, source_lead_id, organisation_id) -- avoid duplicates
+);
+CREATE TABLE lead_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organisation_id INT NOT NULL,
+    lead_meta_id INT NOT NULL,                          -- link to raw meta
+    email VARCHAR(150),
+    phone VARCHAR(30),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    full_name VARCHAR(200),
+    raw_field_data JSON,                                -- custom Q&A storage
+    consent_time DATETIME,
+    platform_key ENUM('facebook','instagram','website') NOT NULL,
+    source_page_id VARCHAR(64),
+    source_page_name VARCHAR(150),
+    status ENUM('new','qualified','contacted','meeting_scheduled','proposal_sent','negotiation','won','lost') DEFAULT 'new',
+    assigned_user_id INT DEFAULT NULL,
+    assigned_at DATETIME DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_leaddata_org FOREIGN KEY (organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leaddata_meta FOREIGN KEY (lead_meta_id) REFERENCES lead_meta(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leaddata_user FOREIGN KEY (assigned_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+
+CREATE TABLE lead_assignments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organisation_id INT NOT NULL,
+    lead_id INT NOT NULL,
+    assigned_user_id INT DEFAULT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assigned_by_user_id INT NOT NULL,
+    previous_user_id INT DEFAULT NULL,
+    reassignment_reason VARCHAR(255),
+    notes TEXT,
+    updated_by INT DEFAULT NULL,
+
+    CONSTRAINT fk_leadassign_org FOREIGN KEY (organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leadassign_lead FOREIGN KEY (lead_id) REFERENCES lead_data(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leadassign_user FOREIGN KEY (assigned_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_leadassign_byuser FOREIGN KEY (assigned_by_user_id) REFERENCES users(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_leadassign_updatedby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE assignment_status_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    assignment_id INT NOT NULL,
+    old_status VARCHAR(50) DEFAULT NULL,
+    new_status VARCHAR(50) NOT NULL,
+    changed_by INT DEFAULT NULL,
+    reason TEXT DEFAULT NULL,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_assignhist_assignment FOREIGN KEY (assignment_id) REFERENCES lead_assignments(id) ON DELETE CASCADE,
+    CONSTRAINT fk_assignhist_changedby FOREIGN KEY (changed_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE lead_activities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organisation_id INT NOT NULL,
+    lead_id INT NOT NULL,
+    user_id INT NOT NULL,
+    activity_type ENUM('call','email','meeting','note','status_change','assignment','follow_up') NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    next_follow_up_date DATETIME,
+    priority ENUM('low','medium','high','urgent') DEFAULT 'medium',
+    status ENUM('pending','completed','cancelled') DEFAULT 'pending',
+
+    CONSTRAINT fk_leadact_org FOREIGN KEY (organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leadact_lead FOREIGN KEY (lead_id) REFERENCES lead_data(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leadact_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE lead_statuses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE lead_stages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organisation_id INT NOT NULL,
+    lead_id INT NOT NULL,
+    status_id INT NOT NULL,
+    entered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exited_at TIMESTAMP NULL,
+    duration_hours DECIMAL(10,2),
+    user_id INT NOT NULL,
+    notes TEXT,
+    next_action_required VARCHAR(255),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_leadstage_org FOREIGN KEY (organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leadstage_lead FOREIGN KEY (lead_id) REFERENCES lead_data(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leadstage_status FOREIGN KEY (status_id) REFERENCES lead_statuses(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_leadstage_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
 --
 -- Dumping data for table `organisations`
 --
