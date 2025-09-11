@@ -659,6 +659,469 @@ lead2@example.com,+919876543211,Jane,Smith,XYZ Ltd,facebook
 
 ---
 
+## User Management Endpoints
+
+### Get All Users
+**GET** `/users`
+
+**Description:** Get list of all users in the organization
+
+**Query Parameters:**
+- `limit` (optional): Number of results (default: 50)
+- `offset` (optional): Pagination offset (default: 0)
+- `search` (optional): Search by name or email
+- `role_id` (optional): Filter by role ID
+- `status` (optional): Filter by status (active, inactive)
+
+**Response:**
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "id": 123,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+919876543210",
+      "role_id": 4,
+      "role_name": "team_member",
+      "organisation_id": 1,
+      "organisation_name": "Test Organisation",
+      "is_verified": true,
+      "created_at": "2025-01-15T10:30:00Z",
+      "updated_at": "2025-01-15T10:30:00Z"
+    }
+  ],
+  "total_count": 25,
+  "pagination": {
+    "limit": 50,
+    "offset": 0,
+    "has_more": false
+  }
+}
+```
+
+### Get Unassigned Users
+**GET** `/users/unassigned`
+
+**Description:** Get users who are not assigned to any organization
+
+**Response:**
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "id": 124,
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "phone": "+919876543211",
+      "role_id": 4,
+      "role_name": "team_member",
+      "organisation_id": null,
+      "is_verified": true,
+      "created_at": "2025-01-15T11:00:00Z"
+    }
+  ]
+}
+```
+
+### Get Users by Organization
+**GET** `/users/organisation/:organisationId`
+
+**Description:** Get all users belonging to a specific organization
+
+**Parameters:**
+- `organisationId` (path): Organization ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "organisation_id": 1,
+  "users": [
+    {
+      "id": 123,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+919876543210",
+      "role_id": 4,
+      "role_name": "team_member",
+      "is_verified": true,
+      "created_at": "2025-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+### Get User by ID
+**GET** `/users/:id`
+
+**Description:** Get detailed information about a specific user
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "user": {
+    "id": 123,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+919876543210",
+    "role_id": 4,
+    "role_name": "team_member",
+    "organisation_id": 1,
+    "organisation_name": "Test Organisation",
+    "is_verified": true,
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z",
+    "last_login": "2025-01-15T14:20:00Z"
+  }
+}
+```
+
+### Create User
+**POST** `/users`
+
+**Description:** Create a new user account
+
+**Request Body:**
+```json
+{
+  "name": "Alice Johnson",
+  "email": "alice@example.com",
+  "phone": "+919876543212",
+  "password": "securePassword123",
+  "role_id": 4,
+  "organisation_id": 1
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User created successfully",
+  "user": {
+    "id": 125,
+    "name": "Alice Johnson",
+    "email": "alice@example.com",
+    "phone": "+919876543212",
+    "role_id": 4,
+    "organisation_id": 1,
+    "is_verified": false,
+    "created_at": "2025-01-15T15:00:00Z"
+  }
+}
+```
+
+### Update User
+**PUT** `/users/:id`
+
+**Description:** Update user information
+
+**Parameters:**
+- `id` (path): User ID
+
+**Request Body:**
+```json
+{
+  "name": "John Smith",
+  "email": "johnsmith@example.com",
+  "phone": "+919876543220",
+  "role_id": 3
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User updated successfully",
+  "user": {
+    "id": 123,
+    "name": "John Smith",
+    "email": "johnsmith@example.com",
+    "phone": "+919876543220",
+    "role_id": 3,
+    "role_name": "Manager",
+    "updated_at": "2025-01-15T15:30:00Z"
+  }
+}
+```
+
+### Delete User
+**DELETE** `/users/:id`
+
+**Description:** Delete a user account
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
+
+### Assign User to Organization
+**POST** `/users/:id/assign-organisation`
+
+**Description:** Assign a user to an organization
+
+**Parameters:**
+- `id` (path): User ID
+
+**Request Body:**
+```json
+{
+  "organisation_id": 1
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User assigned to organisation successfully",
+  "user": {
+    "id": 124,
+    "name": "Jane Smith",
+    "organisation_id": 1,
+    "organisation_name": "Test Organisation"
+  }
+}
+```
+
+### Remove User from Organization
+**DELETE** `/users/:id/remove-organisation`
+
+**Description:** Remove a user from their current organization
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User removed from organisation successfully"
+}
+```
+
+### Assign Role to User
+**POST** `/users/:id/assign-role`
+
+**Description:** Assign a role to a user
+
+**Parameters:**
+- `id` (path): User ID
+
+**Request Body:**
+```json
+{
+  "role_id": 3
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Role assigned successfully",
+  "user": {
+    "id": 123,
+    "name": "John Doe",
+    "role_id": 3,
+    "role_name": "Manager"
+  }
+}
+```
+
+### Remove Role from User
+**DELETE** `/users/:id/remove-role`
+
+**Description:** Remove role from a user (sets to default team_member role)
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Role removed successfully",
+  "user": {
+    "id": 123,
+    "name": "John Doe",
+    "role_id": 4,
+    "role_name": "team_member"
+  }
+}
+```
+
+### Reset User Password
+**POST** `/users/:id/reset-password`
+
+**Description:** Reset a user's password and send new password via email
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Password reset successfully. New password sent to user's email."
+}
+```
+
+---
+
+## User Invitation System
+
+### Send User Invitation
+**POST** `/users/invite`
+
+**Description:** Send an invitation to join the organization
+
+**Request Body:**
+```json
+{
+  "email": "newuser@example.com",
+  "organisation_id": 1,
+  "role_id": 4
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Invitation sent successfully",
+  "invitation": {
+    "id": 1,
+    "email": "newuser@example.com",
+    "expires_at": "2025-01-22T15:30:00Z"
+  }
+}
+```
+
+### Get Invitation Details
+**GET** `/users/invitation/:token`
+
+**Description:** Get invitation details by token (public endpoint)
+
+**Parameters:**
+- `token` (path): Invitation token
+
+**Response:**
+```json
+{
+  "success": true,
+  "invitation": {
+    "email": "newuser@example.com",
+    "organisation_name": "Test Organisation",
+    "role_name": "team_member",
+    "invited_by_name": "John Doe",
+    "expires_at": "2025-01-22T15:30:00Z"
+  }
+}
+```
+
+### Accept Invitation
+**POST** `/users/accept-invitation`
+
+**Description:** Accept invitation and create user account (public endpoint)
+
+**Request Body:**
+```json
+{
+  "token": "invitation_token_here",
+  "name": "New User",
+  "phone": "+919876543213",
+  "password": "securePassword123"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Invitation accepted successfully. Account created.",
+  "user": {
+    "id": 126,
+    "name": "New User",
+    "email": "newuser@example.com",
+    "phone": "+919876543213",
+    "organisation_id": 1,
+    "role_id": 4
+  }
+}
+```
+
+### Get Pending Invitations
+**GET** `/users/invitations`
+
+**Description:** Get all pending invitations for the organization
+
+**Response:**
+```json
+{
+  "success": true,
+  "invitations": [
+    {
+      "id": 1,
+      "email": "pending@example.com",
+      "role_name": "team_member",
+      "invited_by_name": "John Doe",
+      "created_at": "2025-01-15T15:30:00Z",
+      "expires_at": "2025-01-22T15:30:00Z",
+      "status": "pending"
+    }
+  ]
+}
+```
+
+### Cancel Invitation
+**DELETE** `/users/invitations/:id`
+
+**Description:** Cancel a pending invitation
+
+**Parameters:**
+- `id` (path): Invitation ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Invitation cancelled successfully"
+}
+```
+
+### Resend Invitation
+**POST** `/users/invitations/:id/resend`
+
+**Description:** Resend invitation with new token and expiry
+
+**Parameters:**
+- `id` (path): Invitation ID
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Invitation resent successfully"
+}
+```
+
+---
+
 ## Error Responses
 
 All endpoints may return the following error responses:

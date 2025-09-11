@@ -1,8 +1,10 @@
 const express = require('express');
 const AssignmentController = require('./controller');
 const AssignmentAnalytics = require('./analytics');
-const { authenticateToken } = require('../middleware/auth');
-const { rateLimitMiddleware } = require('../middleware/rateLimiter');
+const { authenticateToken } = require('../middlewares/auth.middleware');
+const FormValidationMiddleware = require('../middlewares/form-validation.middleware');
+
+const assignmentRateLimit = FormValidationMiddleware.createRateLimit(15 * 60 * 1000, 20); // 20 requests per 15 minutes
 
 const router = express.Router();
 
@@ -17,8 +19,8 @@ const router = express.Router();
  */
 router.post('/auto-assign', 
     authenticateToken,
-    rateLimitMiddleware,
-    AssignmentController.autoAssignLead
+    assignmentRateLimit,
+    AssignmentController.assignLead
 );
 
 /**
@@ -27,8 +29,8 @@ router.post('/auto-assign',
  */
 router.post('/manual-assign',
     authenticateToken,
-    rateLimitMiddleware,
-    AssignmentController.manualAssignLead
+    assignmentRateLimit,
+    AssignmentController.assignLead
 );
 
 /**
@@ -37,7 +39,7 @@ router.post('/manual-assign',
  */
 router.get('/history/:leadId',
     authenticateToken,
-    AssignmentController.getAssignmentHistory
+    AssignmentController.getLeadAssignmentHistory
 );
 
 /**
@@ -64,8 +66,8 @@ router.get('/organisation/:orgId',
  */
 router.put('/reassign',
     authenticateToken,
-    rateLimitMiddleware,
-    AssignmentController.bulkReassignLeads
+    assignmentRateLimit,
+    AssignmentController.bulkReassign
 );
 
 /**
