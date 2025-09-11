@@ -1,0 +1,94 @@
+name: LeadMagnate API Deployment (Self-Hosted Docker)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-api:
+    runs-on: self-hosted
+
+    steps:
+      - name: 🧹 Clean old API code
+        run: |
+          echo "Deleting old API code..."
+          sudo rm -rf /var/www/leadmagnate-api
+          sudo rm -f /var/www/docker-compose.yml
+
+      - name: 📁 Create folder and set permissions
+        run: |
+          sudo mkdir -p /var/www/leadmagnate-api
+          sudo chown -R $USER:$USER /var/www
+
+      - name: ⬇️ Clone API Repo
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          GH_PAT=$(echo -n "$GH_PAT" | tr -d '\r\n')
+          git clone "https://$GH_PAT@github.com/FXCareers/LeadMagnate.git" /var/www/leadmagnate-api
+
+      - name: 🐳 Create Docker Compose File for API
+        run: |
+          cat <<'EOF' | sudo tee /var/www/docker-compose.yml
+          version: '3.8'
+          services:
+            api:
+              build:
+                context: ./leadmagnate-api
+                tags:
+                  - leadmagnate-api:latest
+              container_name: leadmagnate-api
+              image: leadmagnate-api:latest
+              ports:
+                - "600:6000"
+              restart: always
+              environment:
+                DB_USER: root
+                DB_HOST: mysql-db
+                DB_NAME: leadmagnate
+                DB_PASSWORD: "Yawealth@123#$"
+                DB_PORT: 3306
+                DB_DIALECT: mysql
+              networks:
+                - leadmagnate_network
+
+          networks:
+            leadmagnate_network:
+              external: true
+          EOF
+
+      - name: 🧹 Clean up dangling Docker images & volumes before build
+        run: |
+          echo "Pruning old dangling Docker images..."
+          docker image prune -f || true
+          echo "Pruning unused Docker volumes..."
+          docker volume prune -f || true
+
+      - name: 🗄️ Docker Disk Usage Report
+        run: |
+          echo "=== Docker System Disk Usage ==="
+          docker system df
+          echo ""
+          echo "=== Docker Volumes Size ==="
+          for volume in $(docker volume ls -q); do
+            size=$(sudo du -sh /var/lib/docker/volumes/$volume/_data 2>/dev/null | awk '{print $1}')
+            echo "Volume: $volume  Size: ${size:-0}"
+          done
+
+      - name: 🐳 Ensure network exists
+        run: |
+          docker network inspect leadmagnate_network >/dev/null 2>&1 || docker network create leadmagnate_network
+
+      - name: 🐳 Connect existing MySQL container to network
+        run: |
+          docker network connect leadmagnate_network mysql-db || true
+
+      - name: 🐳 Deploy API Container (Safe)
+        run: |
+          cd /var/www
+          docker compose up --build -d
+
+      - name: ✅ Show API container logs (last 50 lines)
+        run: |
+          docker logs --tail 50 leadmagnate-api
