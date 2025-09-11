@@ -3,7 +3,7 @@ name: LeadMagnate API Deployment (Self-Hosted Docker)
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy-api:
