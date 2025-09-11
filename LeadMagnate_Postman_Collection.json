@@ -1,0 +1,1231 @@
+{
+	"info": {
+		"_postman_id": "leadmagnate-api-collection",
+		"name": "LeadMagnate API Collection",
+		"description": "Comprehensive API collection for LeadMagnate lead management system with sample requests and responses",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "leadmagnate"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+919876543210\",\n  \"password\": \"securePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+919876543210\",\n  \"password\": \"securePassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/register",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "register"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully. Please verify your email.\",\n  \"user_id\": 123\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.token) {",
+									"        pm.environment.set('auth_token', response.token);",
+									"        pm.environment.set('user_id', response.user.id);",
+									"        pm.environment.set('organisation_id', response.user.organisation_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": ["{{base_url}}"],
+									"path": ["auth", "login"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": 123,\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"role\": \"team_member\",\n    \"organisation_id\": 1\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john@example.com\",\n  \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/verify-email",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "verify-email"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Lead Management",
+			"item": [
+				{
+					"name": "Capture Website Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lead@example.com\",\n  \"phone\": \"+919876543210\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"full_name\": \"Jane Smith\",\n  \"page_url\": \"https://example.com/contact\",\n  \"utm_source\": \"google\",\n  \"utm_medium\": \"cpc\",\n  \"utm_campaign\": \"summer_sale\",\n  \"custom_fields\": {\n    \"company\": \"ABC Corp\",\n    \"interest\": \"Product Demo\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/capture-website-lead",
+							"host": ["{{base_url}}"],
+							"path": ["leads", "capture-website-lead"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/leads/capture-website-lead",
+									"host": ["{{base_url}}"],
+									"path": ["leads", "capture-website-lead"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Lead captured successfully\",\n  \"lead_id\": 456,\n  \"lead_meta_id\": 789,\n  \"assigned_to\": {\n    \"user_id\": 123,\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Capture Landing Page Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lead@example.com\",\n  \"phone\": \"+919876543210\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"page_url\": \"https://example.com/landing\",\n  \"utm_source\": \"facebook\",\n  \"utm_campaign\": \"lead_gen\",\n  \"custom_fields\": {\n    \"budget\": \"$10,000\",\n    \"timeline\": \"3 months\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/capture-landing-page-lead",
+							"host": ["{{base_url}}"],
+							"path": ["leads", "capture-landing-page-lead"]
+						}
+					}
+				},
+				{
+					"name": "Facebook Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Hub-Signature-256",
+								"value": "sha256=<signature>"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"object\": \"page\",\n  \"entry\": [\n    {\n      \"id\": \"page_id\",\n      \"time\": 1234567890,\n      \"changes\": [\n        {\n          \"value\": {\n            \"leadgen_id\": \"lead_id\",\n            \"page_id\": \"page_id\",\n            \"form_id\": \"form_id\",\n            \"adgroup_id\": \"ad_id\",\n            \"campaign_id\": \"campaign_id\",\n            \"created_time\": 1234567890\n          },\n          \"field\": \"leadgen\"\n        }\n      ]\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/facebook-webhook",
+							"host": ["{{base_url}}"],
+							"path": ["leads", "facebook-webhook"]
+						}
+					}
+				},
+				{
+					"name": "Bulk Import Leads",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/leads.csv"
+								},
+								{
+									"key": "organisation_id",
+									"value": "{{organisation_id}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/bulk-import",
+							"host": ["{{base_url}}"],
+							"path": ["leads", "bulk-import"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🎯 Lead Assignment",
+			"item": [
+				{
+					"name": "Auto Assign Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lead_ids\": [456, 789, 101]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/assignments/auto-assign",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "auto-assign"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/assignments/auto-assign",
+									"host": ["{{base_url}}"],
+									"path": ["assignments", "auto-assign"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Leads assigned successfully\",\n  \"assignments\": [\n    {\n      \"lead_id\": 456,\n      \"assigned_to\": 123,\n      \"assigned_user_name\": \"John Doe\",\n      \"assignment_id\": 1001\n    },\n    {\n      \"lead_id\": 789,\n      \"assigned_to\": 124,\n      \"assigned_user_name\": \"Alice Johnson\",\n      \"assignment_id\": 1002\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Manual Assign Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lead_id\": 456,\n  \"assigned_to\": 123,\n  \"notes\": \"High priority lead - follow up within 24 hours\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/assignments/manual-assign",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "manual-assign"]
+						}
+					}
+				},
+				{
+					"name": "Get Assignment History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/history/456",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "history", "456"]
+						}
+					}
+				},
+				{
+					"name": "Get User Assignments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/user/{{user_id}}?status=active&limit=50&offset=0",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "user", "{{user_id}}"],
+							"query": [
+								{
+									"key": "status",
+									"value": "active"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Assignment Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/stats?date_from=2025-01-01&date_to=2025-01-15",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "stats"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2025-01-15"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Bulk Reassign Leads",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"assignments\": [\n    {\n      \"lead_id\": 456,\n      \"new_assigned_to\": 124,\n      \"reason\": \"Workload balancing\"\n    },\n    {\n      \"lead_id\": 789,\n      \"new_assigned_to\": 125,\n      \"reason\": \"Expertise match\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/assignments/bulk-reassign",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "bulk-reassign"]
+						}
+					}
+				},
+				{
+					"name": "Get Team Members",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/team-members",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "team-members"]
+						}
+					}
+				},
+				{
+					"name": "Get Load Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/load-balance",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "load-balance"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Analytics & Reporting",
+			"item": [
+				{
+					"name": "Get Assignment Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/analytics?date_from=2025-01-01&date_to=2025-01-15",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "analytics"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2025-01-15"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/assignments/analytics",
+									"host": ["{{base_url}}"],
+									"path": ["assignments", "analytics"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"organisation_id\": 1,\n  \"date_range\": {\n    \"from\": \"2025-01-01\",\n    \"to\": \"2025-01-15\"\n  },\n  \"analytics\": {\n    \"basic_stats\": {\n      \"total_assignments\": 150,\n      \"active_assignments\": 45,\n      \"completed_assignments\": 95,\n      \"cancelled_assignments\": 10,\n      \"avg_completion_hours\": 24.5,\n      \"active_team_members\": 8\n    },\n    \"team_performance\": [\n      {\n        \"user_id\": 123,\n        \"user_name\": \"John Doe\",\n        \"user_email\": \"john@example.com\",\n        \"total_assignments\": 25,\n        \"completed_assignments\": 20,\n        \"active_assignments\": 5,\n        \"avg_completion_hours\": 22.3,\n        \"completion_rate_percent\": 80.0\n      }\n    ]\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Workload Balance Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/analytics/workload-balance",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "analytics", "workload-balance"]
+						}
+					}
+				},
+				{
+					"name": "Generate Performance Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assignments/analytics/performance-report?user_id={{user_id}}&date_from=2025-01-01&date_to=2025-01-15",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "analytics", "performance-report"],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "{{user_id}}"
+								},
+								{
+									"key": "date_from",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "date_to",
+									"value": "2025-01-15"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 Organization Management",
+			"item": [
+				{
+					"name": "Get Organizations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/organisations",
+							"host": ["{{base_url}}"],
+							"path": ["organisations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👤 User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?page=1&limit=10&search=john&role_id=4",
+							"host": ["{{base_url}}"],
+							"path": ["users"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": "john"
+								},
+								{
+									"key": "role_id",
+									"value": "4"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Updated\",\n  \"phone\": \"+919876543211\",\n  \"role_id\": 4\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Users by Organisation",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/organisation/{{organisation_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "organisation", "{{organisation_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Unassigned Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/unassigned",
+							"host": ["{{base_url}}"],
+							"path": ["users", "unassigned"]
+						}
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/profile",
+							"host": ["{{base_url}}"],
+							"path": ["users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"+919876543212\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/profile",
+							"host": ["{{base_url}}"],
+							"path": ["users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Assign Organisation to User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"organisation_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/assign-organisation",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "assign-organisation"]
+						}
+					}
+				},
+				{
+					"name": "Remove Organisation from User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/remove-organisation",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "remove-organisation"]
+						}
+					}
+				},
+				{
+					"name": "Assign Role to User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role_id\": 4\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/assign-role",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "assign-role"]
+						}
+					}
+				},
+				{
+					"name": "Remove Role from User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/remove-role",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "remove-role"]
+						}
+					}
+				},
+				{
+					"name": "Reset User Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "reset-password"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📧 User Invitation System",
+			"item": [
+				{
+					"name": "Send User Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"organisation_id\": {{organisation_id}},\n  \"role_id\": 4\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/invite",
+							"host": ["{{base_url}}"],
+							"path": ["users", "invite"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"organisation_id\": 1,\n  \"role_id\": 4\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/users/invite",
+									"host": ["{{base_url}}"],
+									"path": ["users", "invite"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Invitation sent successfully\",\n  \"invitation\": {\n    \"id\": 1,\n    \"email\": \"newuser@example.com\",\n    \"expires_at\": \"2025-01-22T15:30:00Z\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Invitation Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/invitation/{{invitation_token}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "invitation", "{{invitation_token}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/users/invitation/sample_token_123",
+									"host": ["{{base_url}}"],
+									"path": ["users", "invitation", "sample_token_123"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"invitation\": {\n    \"email\": \"newuser@example.com\",\n    \"organisation_name\": \"Test Organisation\",\n    \"role_name\": \"team_member\",\n    \"invited_by_name\": \"John Doe\",\n    \"expires_at\": \"2025-01-22T15:30:00Z\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Accept Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{invitation_token}}\",\n  \"name\": \"New User\",\n  \"phone\": \"+919876543213\",\n  \"password\": \"securePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/accept-invitation",
+							"host": ["{{base_url}}"],
+							"path": ["users", "accept-invitation"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"token\": \"invitation_token_here\",\n  \"name\": \"New User\",\n  \"phone\": \"+919876543213\",\n  \"password\": \"securePassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/users/accept-invitation",
+									"host": ["{{base_url}}"],
+									"path": ["users", "accept-invitation"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Invitation accepted successfully. Account created.\",\n  \"user\": {\n    \"id\": 126,\n    \"name\": \"New User\",\n    \"email\": \"newuser@example.com\",\n    \"phone\": \"+919876543213\",\n    \"organisation_id\": 1,\n    \"role_id\": 4\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Pending Invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/invitations",
+							"host": ["{{base_url}}"],
+							"path": ["users", "invitations"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/users/invitations",
+									"host": ["{{base_url}}"],
+									"path": ["users", "invitations"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"invitations\": [\n    {\n      \"id\": 1,\n      \"email\": \"pending@example.com\",\n      \"role_name\": \"team_member\",\n      \"invited_by_name\": \"John Doe\",\n      \"created_at\": \"2025-01-15T15:30:00Z\",\n      \"expires_at\": \"2025-01-22T15:30:00Z\",\n      \"status\": \"pending\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel Invitation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/invitations/{{invitation_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "invitations", "{{invitation_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/users/invitations/1",
+									"host": ["{{base_url}}"],
+									"path": ["users", "invitations", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Invitation cancelled successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Resend Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/invitations/{{invitation_id}}/resend",
+							"host": ["{{base_url}}"],
+							"path": ["users", "invitations", "{{invitation_id}}", "resend"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/users/invitations/1/resend",
+									"host": ["{{base_url}}"],
+									"path": ["users", "invitations", "1", "resend"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"message\": \"Invitation resent successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "👥 Role Management",
+			"item": [
+				{
+					"name": "Get Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": ["{{base_url}}"],
+							"path": ["roles"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/roles",
+									"host": ["{{base_url}}"],
+									"path": ["roles"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"roles\": [\n    {\n      \"id\": 1,\n      \"name\": \"Superadmin\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"Org-admin\"\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Manager\"\n    },\n    {\n      \"id\": 4,\n      \"name\": \"team_member\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Pre-request script for LeadMagnate API",
+					"console.log('Making request to:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script for LeadMagnate API",
+					"pm.test('Status code is 200 or 201', function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+					"});",
+					"",
+					"pm.test('Response has success field', function () {",
+					"    const jsonData = pm.response.json();",
+					"    pm.expect(jsonData).to.have.property('success');",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "organisation_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "invitation_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "invitation_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
