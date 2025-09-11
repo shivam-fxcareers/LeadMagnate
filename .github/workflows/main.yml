@@ -46,7 +46,7 @@ jobs:
               environment:
                 DB_USER: root
                 DB_HOST: mysql-db
-                DB_NAME: leadmagnate
+                DB_NAME: lead_magnate
                 DB_PASSWORD: "Yawealth@123#$"
                 DB_PORT: 3306
                 DB_DIALECT: mysql
