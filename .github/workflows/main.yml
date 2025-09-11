@@ -3,24 +3,27 @@ name: LeadMagnate API Deployment (Self-Hosted Docker)
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy-api:
     runs-on: self-hosted
 
     steps:
+      # 🧹 Clean old API code
       - name: 🧹 Clean old API code
         run: |
-          echo "Deleting old API code..."
+          echo "Deleting old LeadMagnate code..."
           sudo rm -rf /var/www/leadmagnate-api
           sudo rm -f /var/www/docker-compose.yml
 
+      # 📁 Create folder and set permissions
       - name: 📁 Create folder and set permissions
         run: |
           sudo mkdir -p /var/www/leadmagnate-api
           sudo chown -R $USER:$USER /var/www
 
+      # ⬇️ Clone API Repo
       - name: ⬇️ Clone API Repo
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -28,25 +31,24 @@ jobs:
           GH_PAT=$(echo -n "$GH_PAT" | tr -d '\r\n')
           git clone "https://$GH_PAT@github.com/FXCareers/LeadMagnate.git" /var/www/leadmagnate-api
 
+      # 🐳 Create Docker Compose File for API
       - name: 🐳 Create Docker Compose File for API
         run: |
           cat <<'EOF' | sudo tee /var/www/docker-compose.yml
-          version: '3.8'
           services:
             api:
               build:
                 context: ./leadmagnate-api
-                tags:
-                  - leadmagnate-api:latest
               container_name: leadmagnate-api
               image: leadmagnate-api:latest
               ports:
-                - "6000:6000"
+                - "6001:6001"         # ✅ Port updated to 6001
               restart: always
               environment:
+                PORT: 6001            # ✅ Pass port inside container
                 DB_USER: root
                 DB_HOST: mysql-db
-                DB_NAME: lead_magnate
+                DB_NAME: leadmagnate
                 DB_PASSWORD: "Yawealth@123#$"
                 DB_PORT: 3306
                 DB_DIALECT: mysql
@@ -58,13 +60,13 @@ jobs:
               external: true
           EOF
 
-      - name: 🧹 Clean up dangling Docker images & volumes before build
+      # 🧹 Clean up dangling Docker images & volumes
+      - name: 🧹 Clean up dangling Docker images & volumes
         run: |
-          echo "Pruning old dangling Docker images..."
           docker image prune -f || true
-          echo "Pruning unused Docker volumes..."
           docker volume prune -f || true
 
+      # 🗄️ Docker Disk Usage Report
       - name: 🗄️ Docker Disk Usage Report
         run: |
           echo "=== Docker System Disk Usage ==="
@@ -76,19 +78,23 @@ jobs:
             echo "Volume: $volume  Size: ${size:-0}"
           done
 
+      # 🐳 Ensure network exists
       - name: 🐳 Ensure network exists
         run: |
           docker network inspect leadmagnate_network >/dev/null 2>&1 || docker network create leadmagnate_network
 
+      # 🐳 Connect existing MySQL container to network
       - name: 🐳 Connect existing MySQL container to network
         run: |
           docker network connect leadmagnate_network mysql-db || true
 
-      - name: 🐳 Deploy API Container (Safe)
+      # 🐳 Deploy API Container
+      - name: 🐳 Deploy API Container
         run: |
           cd /var/www
           docker compose up --build -d
 
-      - name: ✅ Show API container logs (last 50 lines)
+      # ✅ Show API container logs
+      - name: ✅ Show API container logs
         run: |
           docker logs --tail 50 leadmagnate-api
