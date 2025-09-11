@@ -20,7 +20,7 @@ app.use('/api/leads', leadsRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/users', userRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 6000;
 
 (async () => {
   const isConnected = await testConnection();
