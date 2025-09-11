@@ -7,5 +7,5 @@ RUN npm install --omit=dev    # changed from npm ci
 
 COPY . .
 
-EXPOSE 6000
+EXPOSE 6001
 CMD ["npm", "start"]
