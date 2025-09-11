@@ -41,7 +41,7 @@ jobs:
               container_name: leadmagnate-api
               image: leadmagnate-api:latest
               ports:
-                - "600:6000"
+                - "6000:6000"
               restart: always
               environment:
                 DB_USER: root
