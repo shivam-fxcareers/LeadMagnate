@@ -28,7 +28,7 @@ class UserModel {
             )
             .leftJoin('organisations', 'users.organisation_id', 'organisations.id')
             .leftJoin('roles', 'users.role_id', 'roles.id')
-            .where('users.deleted_at', null); // Exclude soft deleted users
+            .groupBy('users.id');
 
         // Apply filters
         if (filters.search) {
@@ -55,8 +55,26 @@ class UserModel {
         }
 
         // Get total count for pagination
-        const countQuery = query.clone();
-        const totalCount = await countQuery.count('users.id as count').first();
+        const countQuery = db('users')
+            .where(function() {
+                if (filters.search) {
+                    this.where('name', 'like', `%${filters.search}%`)
+                        .orWhere('email', 'like', `%${filters.search}%`);
+                }
+                if (filters.organisation_id) {
+                    this.where('organisation_id', filters.organisation_id);
+                }
+                if (filters.role_id) {
+                    this.where('role_id', filters.role_id);
+                }
+                if (filters.is_verified !== undefined) {
+                    this.where('is_verified', filters.is_verified);
+                }
+                if (filters.unassigned === 'true') {
+                    this.whereNull('organisation_id');
+                }
+            });
+        const totalCount = await countQuery.count('* as count').first();
         const total = parseInt(totalCount.count);
 
         // Apply pagination and sorting
@@ -99,7 +117,6 @@ class UserModel {
             .leftJoin('organisations', 'users.organisation_id', 'organisations.id')
             .leftJoin('roles', 'users.role_id', 'roles.id')
             .where('users.id', userId)
-            .whereNull('users.deleted_at')
             .first();
     }
 
@@ -126,14 +143,13 @@ class UserModel {
             )
             .leftJoin('roles', 'users.role_id', 'roles.id')
             .where('users.organisation_id', organisationId)
-            .whereNull('users.deleted_at')
+
             .orderBy('users.created_at', 'desc')
             .limit(limit)
             .offset(offset);
 
         const totalCount = await db('users')
             .where('organisation_id', organisationId)
-            .whereNull('deleted_at')
             .count('id as count')
             .first();
 
@@ -201,7 +217,6 @@ class UserModel {
 
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
             .update(filteredData);
 
         return result > 0;
@@ -216,7 +231,6 @@ class UserModel {
     static async assignUserToOrganisation(userId, organisationId) {
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
             .update({
                 organisation_id: organisationId,
                 updated_at: new Date()
@@ -233,7 +247,6 @@ class UserModel {
     static async removeUserFromOrganisation(userId) {
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
             .update({
                 organisation_id: null,
                 role_id: null, // Remove role when removing from org
@@ -252,7 +265,6 @@ class UserModel {
     static async assignRoleToUser(userId, roleId) {
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
             .update({
                 role_id: roleId,
                 updated_at: new Date()
@@ -269,7 +281,6 @@ class UserModel {
     static async removeRoleFromUser(userId) {
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
             .update({
                 role_id: null,
                 updated_at: new Date()
@@ -279,18 +290,14 @@ class UserModel {
     }
 
     /**
-     * Soft delete user
+     * Delete user
      * @param {number} userId - User ID
      * @returns {boolean} Success status
      */
     static async deleteUser(userId) {
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
-            .update({
-                deleted_at: new Date(),
-                updated_at: new Date()
-            });
+            .del();
 
         return result > 0;
     }
@@ -303,8 +310,7 @@ class UserModel {
      */
     static async emailExists(email, excludeUserId = null) {
         let query = db('users')
-            .where('email', email)
-            .whereNull('deleted_at');
+            .where('email', email);
 
         if (excludeUserId) {
             query = query.where('id', '!=', excludeUserId);
@@ -325,7 +331,6 @@ class UserModel {
         
         const result = await db('users')
             .where('id', userId)
-            .whereNull('deleted_at')
             .update({
                 password: hashedPassword,
                 updated_at: new Date()
@@ -357,14 +362,14 @@ class UserModel {
                 )
                 .leftJoin('roles', 'users.role_id', 'roles.id')
                 .whereNull('users.organisation_id')
-                .where('users.deleted_at', null)
+
                 .orderBy('users.created_at', 'desc')
                 .limit(limit)
                 .offset(offset);
 
             const totalCount = await db('users')
                 .whereNull('organisation_id')
-                .where('deleted_at', null)
+
                 .count('id as count')
                 .first();
 
@@ -460,7 +465,6 @@ class UserModel {
             // Check if email already exists
             const existingUser = await trx('users')
                 .where('email', invitation.email)
-                .where('deleted_at', null)
                 .first();
 
             if (existingUser) {

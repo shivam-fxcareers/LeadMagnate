@@ -9,6 +9,13 @@ const db = knex({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
   },
+  pool: {
+    afterCreate: function(connection, callback) {
+      connection.query('SET sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY,",""))', function(err) {
+        callback(err, connection);
+      });
+    }
+  }
 });
 
 async function testConnection() {

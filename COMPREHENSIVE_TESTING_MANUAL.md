@@ -778,6 +778,12 @@ Authorization: Bearer {{manager_token}}
 
 ## Troubleshooting
 
+### Fixed Issues
+1. **Database Column Error**: Fixed "Unknown column 'users.deleted_at'" error in user management endpoints
+   - **Issue**: The users table doesn't have a deleted_at column but the code was referencing it
+   - **Fix**: Removed all references to deleted_at column from user model queries
+   - **Status**: ✅ Resolved
+
 ### Common Issues:
 
 1. **Token Expiration**
@@ -795,6 +801,13 @@ Authorization: Bearer {{manager_token}}
 4. **Missing Environment Variables**
    - Ensure all Postman variables are set
    - Check base_url configuration
+
+### Debugging Tips
+- Check response headers for additional error information
+- Verify token is included in Authorization header
+- Ensure user has proper role and permissions
+- Check organization association for scoped operations
+- If you encounter database column errors, verify the table schema matches the query
 
 ---
 
